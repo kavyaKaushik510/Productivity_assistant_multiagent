@@ -1,0 +1,20 @@
+# Core
+langgraph>=0.2.34
+langchain>=0.2.14
+langchain-core>=0.2.38
+
+# LLM providers
+langchain-google-genai>=2.0.0
+google-generativeai>=0.7.2
+openai>=1.40.0
+
+# UI
+streamlit>=1.37.0
+
+# Models & utils
+pydantic>=2.7.0
+tenacity>=8.3.0
+python-dotenv>=1.0.1
+
+# Text processing
+typing-extensions>=4.10.0
