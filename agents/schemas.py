@@ -26,7 +26,7 @@ class EmailResponse(BaseModel):
     category: str
     tasks: List[Task] = []
 
-
+#Meeting Agent Schemas
 class MeetingTask(BaseModel):
     title: str
     priority: str = Field(..., description="HIGH, MED, LOW")
@@ -36,8 +36,8 @@ class MeetingTask(BaseModel):
 
 class MeetingResponse(BaseModel):
     summary: str = Field(..., description="Main summary of the meeting")
-    discussion_points: List[str] = Field(default_factory=list, description="Key points discussed")
-    tasks: List[MeetingTask] = Field(default_factory=list, description="Action items for Kavya")
+    discussion_points: List[str] = Field(default_factory=list)
+    tasks: List[MeetingTask] = Field(default_factory=list)
 
 #Calendar Agent Schemas
 

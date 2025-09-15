@@ -1,7 +1,0 @@
-Project X sync – 14th September
-
-Alice: We need to finalise the slides by next Wednesday.
-Bob: I’ll draft the budget estimates today.
-Kavya: I can prepare the technical architecture notes by Friday.
-Alice: Kavya, also follow up with IT on the server migration.
-Bob: Let’s meet again next week to review progress.
