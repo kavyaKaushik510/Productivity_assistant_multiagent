@@ -2,17 +2,29 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 
 
+
 class Task(BaseModel):
+    id: str
     title: str
+    source: str
+    priority: Optional[str] = None   # HIGH, MED, LOW
+    due_raw: Optional[str] = None
+    due_date: Optional[str] = None
+    estimate_min: Optional[int] = None
+    status: str = "PENDING"
     confidence: float
-    due_raw: Optional[str] = None  # e.g., "by Friday"
-    due_date: Optional[str] = None  # e.g., "2025-09-19"
+
+
+class Summary(BaseModel):
+    subject: str
+    category: str
+    text: str
 
 
 class EmailResponse(BaseModel):
     summary: str
     category: str
-    tasks: List[Task]
+    tasks: List[Task] = []
 
 
 class MeetingTask(BaseModel):

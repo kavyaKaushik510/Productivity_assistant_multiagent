@@ -1,35 +1,33 @@
+from agents.schemas import Task
 from datetime import datetime
 
 
 class TaskPrioritiser:
     """Assigns priorities to tasks based on deadlines and keywords."""
 
-    def run(self, tasks: list[dict]) -> dict:
-        logs, updated_tasks = [], []
+    def run(self, tasks: list[Task]) -> dict:
+        logs, updated = [], []
         today = datetime.today().date()
 
         for t in tasks:
-            t_data = dict(t)  # normalise to dict
             priority = "LOW"
 
-            if t_data.get("due_date"):
+            if t.due_date:
                 try:
-                    due = datetime.strptime(t_data["due_date"], "%Y-%m-%d").date()
+                    due = datetime.strptime(t.due_date, "%Y-%m-%d").date()
                     if due <= today:
-                        priority = "HIGH"   # due today or overdue
+                        priority = "HIGH"
                     elif (due - today).days <= 2:
-                        priority = "HIGH"   # due within 2 days
+                        priority = "HIGH"
                     else:
                         priority = "MED"
                 except Exception:
                     pass
-            elif any(v in t_data.get("title", "").lower() for v in ["review", "check", "look at"]):
+            elif any(v in t.title.lower() for v in ["review", "check", "look at"]):
                 priority = "MED"
 
-            # store priority in dict (not in Task schema)
-            t_data["priority"] = priority
-            updated_tasks.append(t_data)
-            logs.append(f"Task '{t_data['title']}' → priority {priority}")
+            updated_task = t.copy(update={"priority": priority})
+            updated.append(updated_task)
+            logs.append(f"Task '{t.title}' → priority {priority}")
 
-        return {"tasks": updated_tasks, "logs": logs}
-
+        return {"tasks": updated, "logs": logs}

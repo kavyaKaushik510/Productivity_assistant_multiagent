@@ -1,5 +1,5 @@
 from langchain_core.output_parsers import PydanticOutputParser
-from agents.schemas import EmailResponse
+from agents.schemas import Summary, Task, EmailResponse
 from langchain_core.prompts import ChatPromptTemplate
 from tools.llm import get_llm
 from tools.gmail_provider import fetch_emails
@@ -77,24 +77,40 @@ class EmailManager:
                     logs.append(f"Ignored PROMO email: '{em['subject']}'")
                     continue
 
-                summaries.append(f"[{em['subject']}] ({result.category}) {result.summary}")
+                summaries.append(Summary(
+                subject=em["subject"],
+                category=result.category,
+                text=result.summary
+                ))
 
                 for idx, t in enumerate(result.tasks):
                     due_date = normalize_due(t.due_raw)
-                    all_tasks.append({
-                        "id": f"{em['id']}_{idx}",
-                        "title": t.title,
-                        "source": self.source_label,
-                        "priority": "MED",  # will be updated later in TaskPrioritizer
-                        "due_raw": t.due_raw,
-                        "due_date": due_date,
-                        "estimate_min": None,
-                        "status": "PENDING",
-                        "confidence": t.confidence
-                    })
+                    all_tasks.append(Task(
+                    id=f"{em['id']}_{idx}",
+                    title=t.title,
+                    source=self.source_label,
+                    priority="MED",   # will be updated later
+                    due_raw=t.due_raw,
+                    due_date=due_date,
+                    estimate_min=None,
+                    status="PENDING",
+                    confidence=t.confidence
+                ))
+                    
+                
+                
 
                 logs.append(f"Processed '{em['subject']}' - {len(result.tasks)} tasks")
             except Exception as e:
                 logs.append(f"ERROR: Processing '{em['subject']}' - {e}")
+        
+        # Deduplicate tasks by title+due_date
+        unique = {}
+        for task in all_tasks:
+            key = (task.title.strip().lower(), task.due_date)
+            if key not in unique:
+                unique[key] = task
+        all_tasks = list(unique.values())
+
 
         return {"summaries": summaries, "tasks": all_tasks, "logs": logs}

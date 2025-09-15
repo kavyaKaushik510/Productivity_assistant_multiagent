@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 from langchain_core.language_models import BaseChatModel
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 
 load_dotenv()
 
@@ -15,11 +16,12 @@ _llm_cache: Dict[str, str] = {}
 
 
 def get_llm() -> BaseChatModel:
-    """Return a configured Gemini chat model."""
-    google_key = os.getenv("GOOGLE_API_KEY")
-    if not google_key:
-        raise ValueError("GOOGLE_API_KEY not set. Please configure in .env")
-    return ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.2)
+    """Return a configured OpenAI chat model."""
+    openai_key = os.getenv("OPENAI_API_KEY")
+    if not openai_key:
+        raise ValueError("OPENAI_API_KEY not set. Please configure in .env")
+
+    return ChatOpenAI(model="gpt-4o-mini", temperature=0.2)
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
