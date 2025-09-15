@@ -2,7 +2,7 @@ from langchain_core.output_parsers import PydanticOutputParser
 from agents.schemas import EmailResponse
 from langchain_core.prompts import ChatPromptTemplate
 from tools.llm import get_llm
-from tools.gmail_provider import fetch_gmail_imap
+from tools.gmail_provider import fetch_emails
 import dateparser
 
 
@@ -22,27 +22,34 @@ class EmailManager:
         # Prompt: classify + extract deadlines
         self.prompt = ChatPromptTemplate.from_template(
             """
-            You are an assistant that extracts ONLY actionable tasks from emails.
+            You are an AI assistant that extracts actionable tasks from emails.
 
-            ### Step 1: Classify the email into one of:
-            - PROMO → advertisements, discounts, newsletters, offers
-            - ALERT → security, account, billing, urgent system messages
-            - MEETING → invites, reminders, calendar notifications
-            - PROJECT → work, school, team updates, assignments, direct action requests
-            - OTHER → anything else (forums, digests, social, FYI)
+            Definition: Actionable Task  
+            An actionable task is a specific action the user can directly perform.  
+            It should be:  
+            - Concrete - clearly describes what to do (e.g., "Submit the report", "Join the Zoom call at 2pm").  
+            - Executable - something the user can realistically take action on.  
+            - Not vague - avoid tasks like "Read this email" or "Consider this information".  
 
-            ### Step 2: Rules
-            - If category is PROMO → set summary to "" (empty string) and tasks to [].
-            - If category is OTHER → return a short summary, but no tasks.
-            - If category is ALERT, MEETING, or PROJECT → return a short summary and actionable tasks.
-            - Each task MUST be something the user can/should do (e.g., "Reset password", "Join Zoom call at 2pm").
-            - Do not invent vague tasks like "Read this email" or "Consider the information".
+            Step 1: Classify the email into one of:
+            - PROMO - advertisements, discounts, newsletters, marketing offers  
+            - ALERT - security notices, account/billing issues, urgent system messages  
+            - MEETING - invites, reminders, or calendar notifications  
+            - PROJECT - work, school, or team updates with clear requests or assignments  
+            - OTHER - anything else (forums, digests, social updates, general FYI)
 
-            ### Step 3: Deadlines
-            - Detect explicit deadlines ("today", "tomorrow", "by Friday", "Sept 20").
-            - Put the original phrase into due_raw.
-            - If possible, also output due_date in YYYY-MM-DD format relative to today.
-            - If no explicit deadline → leave due_raw and due_date as null.
+            Step 2: Rules
+            - PROMO - set summary = "" and tasks = [].  
+            - OTHER - return a short summary but no tasks.  
+            - ALERT, MEETING, PROJECT - return both:  
+                - A short summary of the email.  
+                - A list of actionable tasks (see definition above)
+
+            Step 3: Deadlines
+            - Detect explicit time references (e.g., "today", "tomorrow", "by Friday", "Sept 20").  
+            - Place the exact phrase in due_raw.  
+            - If possible, convert it into an ISO date YYYY-MM-DD (relative to today) in due_date.  
+            - If no deadline is mentioned, set both to null.
 
             EMAIL: {email}
             {format_instructions}
@@ -53,7 +60,7 @@ class EmailManager:
     def run(self, n: int = 3):
         logs, summaries, all_tasks = [], [], []
         try:
-            emails = fetch_gmail_imap(n)
+            emails = fetch_emails(n)
             logs.append(f"Fetched {len(emails)} emails from Gmail.")
         except Exception as e:
             return {"summaries": [], "tasks": [], "logs": [f"ERROR: Gmail fetch failed - {e}"]}
@@ -86,7 +93,7 @@ class EmailManager:
                         "confidence": t.confidence
                     })
 
-                logs.append(f"Processed '{em['subject']}' → {len(result.tasks)} tasks")
+                logs.append(f"Processed '{em['subject']}' - {len(result.tasks)} tasks")
             except Exception as e:
                 logs.append(f"ERROR: Processing '{em['subject']}' - {e}")
 

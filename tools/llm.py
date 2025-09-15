@@ -8,31 +8,23 @@ from dotenv import load_dotenv
 from langchain_core.language_models import BaseChatModel
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-# Load env vars from .env file
 load_dotenv()
 
-# Simple in-memory cache
+# Simple in-memory cache for prompt responses
 _llm_cache: Dict[str, str] = {}
 
 
 def get_llm() -> BaseChatModel:
-    """
-    Return a chat model instance.
-    Prefers Gemini (GOOGLE_API_KEY), otherwise OpenAI (OPENAI_API_KEY).
-    """
+    """Return a configured Gemini chat model."""
     google_key = os.getenv("GOOGLE_API_KEY")
-
-    if google_key:
-        return ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.2)
-    else:
-        raise ValueError("No LLM provider available. Set GOOGLE_API_KEY in .env")
+    if not google_key:
+        raise ValueError("GOOGLE_API_KEY not set. Please configure in .env")
+    return ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.2)
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 def call_llm(prompt: str) -> str:
-    """
-    Call LLM with retries + caching.
-    """
+    """Call LLM with retries and simple caching."""
     if prompt in _llm_cache:
         return _llm_cache[prompt]
 
@@ -47,51 +39,41 @@ def call_llm(prompt: str) -> str:
 # ---- Prompt Helpers ----
 
 def email_to_tasks_prompt(email_text: str) -> str:
-    return f"""
-You are an assistant that extracts actionable tasks from an email.
+    """Prompt: extract a summary and action items from an email."""
+    return f"""Summarize this email in one line, then list any clear action items as bullet points.
 
 EMAIL:
 {email_text}
-
-Return:
-1. A short summary of the thread
-2. A list of actionable tasks (bullet points).
 """
 
 
 def transcript_to_tasks_prompt(transcript_text: str) -> str:
-    return f"""
-You are an assistant that extracts actionable tasks from a meeting transcript.
+    """Prompt: extract a summary and action items from a meeting transcript."""
+    return f"""Summarize this meeting in one line, list discussion points, and extract action items.
 
 TRANSCRIPT:
 {transcript_text}
-
-Return:
-1. A short meeting summary
-2. A list of action items (bullet points).
 """
 
+
 def email_to_tasks_json_prompt(email_text: str) -> str:
-    return f"""
-You are an assistant that extracts actionable tasks from an email.
+    """Prompt: extract summary and actionable tasks in strict JSON format."""
+    return f"""Extract a concise summary and actionable tasks from this email.
 
 EMAIL:
 {email_text}
 
-Return your answer strictly in JSON with this structure:
-
+Respond strictly in JSON with:
 {{
-  "summary": "short one-line summary of the email",
+  "summary": "short summary",
   "tasks": [
-    {{"title": "clear, concise action item", "confidence": 0.85}},
-    {{"title": "another action item", "confidence": 0.75}}
+    {{"title": "task description", "confidence": 0.9}}
   ]
 }}
 
-Rules:
-- Only include true action items (things the user must do).
-- Skip boilerplate like "Summary:" or "Actionable Tasks:" headings.
-- Confidence must be a number between 0 and 1.
-- Maximum 5 tasks per email.
+Guidelines:
+- Only include real action items.
+- Confidence is a float between 0 and 1.
+- Max 10 tasks.
 """
 
