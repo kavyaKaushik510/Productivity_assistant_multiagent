@@ -57,7 +57,7 @@ class EmailManager:
         )
         self.chain = self.prompt | get_llm() | self.parser
 
-    def run(self, n: int = 3):
+    def run(self, n: int = 5):
         logs, summaries, all_tasks = [], [], []
         try:
             emails = fetch_emails(n)

@@ -1,6 +1,5 @@
 # orchestration/graph.py
 from langgraph.graph import StateGraph, END
-from orchestration.state import PlannerState
 
 from agents.email_manager import EmailManager
 from agents.meeting_summariser import MeetingSummariser
@@ -10,7 +9,8 @@ from agents.schemas import Task, MeetingTask
 
 
 def build_graph(doc_id: str | None = None):
-    graph = StateGraph(PlannerState)
+    # Instead of PlannerState, just use dict
+    graph = StateGraph(dict)
 
     email_agent = EmailManager()
     meeting_agent = MeetingSummariser()
@@ -18,53 +18,51 @@ def build_graph(doc_id: str | None = None):
     calendar_agent = CalendarOptimiser()
 
     # --- Node: Email Manager ---
-    def run_email(state: PlannerState):
+    def run_email(state: dict):
         result = email_agent.run(n=5)
-        for t in result["tasks"]:
-            if isinstance(t, Task):
-                state.tasks.append(t)
-            else:
-                state.tasks.append(Task(**t))
-        state.logs.extend(result["logs"])
+        state.setdefault("tasks", []).extend(result["tasks"])
+        state.setdefault("summaries", []).extend(result["summaries"])
+        state.setdefault("logs", []).extend(result["logs"])
         return state
 
     # --- Node: Meeting Summariser ---
-    def run_meeting(state: PlannerState):
+    def run_meeting(state: dict):
         if doc_id:
             result = meeting_agent.run(doc_id)
+            meeting_tasks = []
             for idx, mt in enumerate(result.tasks):
                 if isinstance(mt, MeetingTask):
-                    state.tasks.append(
-                        Task(
-                            id=f"meeting_{idx}",
-                            title=mt.title,
-                            source="meeting",
-                            priority=mt.priority,
-                            due_raw=mt.due_raw,
-                            due_date=mt.due_date,
-                            estimate_min=None,
-                            status="PENDING",
-                            confidence=1.0,
-                        )
-                    )
+                    meeting_tasks.append(Task(
+                        id=f"meeting_{idx}",
+                        title=mt.title,
+                        source="meeting",
+                        priority=mt.priority,
+                        due_raw=mt.due_raw,
+                        due_date=mt.due_date,
+                        estimate_min=None,
+                        status="PENDING",
+                        confidence=1.0,
+                    ))
                 elif isinstance(mt, Task):
-                    state.tasks.append(mt)
-            state.logs.append("Processed meeting notes → tasks added")
+                    meeting_tasks.append(mt)
+
+            state.setdefault("tasks", []).extend(meeting_tasks)
+            state.setdefault("logs", []).append("Processed meeting notes → tasks added")
         return state
 
     # --- Node: Task Prioritiser ---
-    def run_prioritiser(state: PlannerState):
-        result = prioritiser.run(state.tasks)
-        state.tasks = result["tasks"]
-        state.logs.extend(result["logs"])
+    def run_prioritiser(state: dict):
+        result = prioritiser.run(state["tasks"])
+        state["tasks"] = result["tasks"]
+        state.setdefault("logs", []).extend(result["logs"])
         return state
 
     # --- Node: Calendar Optimiser ---
-    def run_calendar(state: PlannerState):
-        result = calendar_agent.run([t.dict() for t in state.tasks])
-        state.events = result.events
-        state.proposals = result.proposals
-        state.logs.extend(result.logs)
+    def run_calendar(state: dict):
+        result = calendar_agent.run([t.dict() for t in state["tasks"]])
+        state["events"] = result.events
+        state["proposals"] = result.proposals
+        state.setdefault("logs", []).extend(result.logs)
         return state
 
     # --- Build Graph ---
@@ -80,11 +78,4 @@ def build_graph(doc_id: str | None = None):
     graph.add_edge("calendar", END)
 
     workflow = graph.compile()
-
-    def invoke(state: PlannerState | None = None) -> PlannerState:
-        raw = workflow.invoke(state.dict() if state else PlannerState().dict())
-        return PlannerState(**raw)
-    workflow.invoke = invoke
-
     return workflow
-
