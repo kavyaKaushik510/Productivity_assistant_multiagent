@@ -75,19 +75,14 @@ class EmailManager:
                         text=meeting_result.summary
                     ))
 
-                    for idx, mt in enumerate(meeting_result.tasks):
-                        due_date = normalize_due(mt.due_raw)
-                        all_tasks.append(Task(
-                            id=f"{em['id']}_mt_{idx}",
-                            title=mt.title,
-                            source="meeting",
-                            priority=mt.priority,
-                            due_raw=mt.due_raw,
-                            due_date=due_date,
-                            estimate_min=None,
-                            status="PENDING",
-                            confidence=1.0
-                        ))
+                for idx, t in enumerate(meeting_result.tasks):
+                    due_date = normalize_due(t.due_raw)
+                    all_tasks.append(t.copy(update={
+                        "id": f"{em['id']}_mt_{idx}",
+                        "source": "meeting",
+                        "due_date": due_date
+                    }))
+
                     continue
 
                 # Email classification

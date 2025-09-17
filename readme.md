@@ -28,3 +28,9 @@ It integrates with **Gmail, Google Docs, and Google Calendar** to automatically 
    git clone <your-repo-url>
    cd <your-repo-folder>
    pip install -r requirements.txt
+
+1. **Run the final pipeline**
+   ```bash
+python -m tests.test_pipeline
+  
+   

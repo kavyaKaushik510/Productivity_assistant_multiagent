@@ -4,16 +4,15 @@ from datetime import datetime
 
 
 class Task(BaseModel):
-    id: str
+    id: Optional[str] = None
     title: str
-    source: str
-    priority: Optional[str] = None   # HIGH, MED, LOW
+    source: Optional[str] = None
+    priority: str = "MED"   #default
     due_raw: Optional[str] = None
     due_date: Optional[str] = None
     estimate_min: Optional[int] = None
     status: str = "PENDING"
-    confidence: float
-
+    confidence: Optional[float] = 1.0
 
 class Summary(BaseModel):
     subject: str
@@ -27,20 +26,13 @@ class EmailResponse(BaseModel):
     tasks: List[Task] = []
 
 #Meeting Agent Schemas
-class MeetingTask(BaseModel):
-    title: str
-    priority: str = Field(..., description="HIGH, MED, LOW")
-    due_raw: Optional[str] = None
-    due_date: Optional[str] = None
-
 
 class MeetingResponse(BaseModel):
     summary: str = Field(..., description="Main summary of the meeting")
     discussion_points: List[str] = Field(default_factory=list)
-    tasks: List[MeetingTask] = Field(default_factory=list)
+    tasks: List[Task] = Field(default_factory=list)
 
 #Calendar Agent Schemas
-
 class CalendarEvent(BaseModel):
     id: str
     title: str

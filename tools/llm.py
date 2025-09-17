@@ -16,16 +16,12 @@ _llm_cache: Dict[str, str] = {}
 
 
 def get_llm() -> BaseChatModel:
-    """Return a configured Gemini chat model."""
-    gemini_key = os.getenv("GEMINI_API_KEY")
-    if not gemini_key:
-        raise ValueError("GEMINI_API_KEY not set. Please configure in .env")
+    """Return a configured OpenAI chat model."""
+    openai_key = os.getenv("OPENAI_API_KEY")
+    if not openai_key:
+        raise ValueError("OPENAI_API_KEY not set. Please configure in .env")
 
-    return ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash", 
-        temperature=0.2,
-        google_api_key=gemini_key,
-    )
+    return ChatOpenAI(model="gpt-4o-mini", temperature=0.2)
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
