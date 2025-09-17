@@ -30,8 +30,7 @@ It integrates with **Gmail, Google Docs, and Google Calendar** to automatically 
 
 2. **Run the final pipeline**
    ```bash
-python -m tests.test_pipeline
-
-sample_output.txt contains an example of a run setup
+   python -m tests.test_pipeline
+   sample_output.txt contains an example of a run setup
   
    
