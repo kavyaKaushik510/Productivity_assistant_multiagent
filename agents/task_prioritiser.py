@@ -26,7 +26,7 @@ class TaskPrioritiser:
             elif any(v in t.title.lower() for v in ["review", "check", "look at"]):
                 priority = "MED"
 
-            updated_task = t.copy(update={"priority": priority})
+            updated_task = t.model_copy(update={"priority": priority})
             updated.append(updated_task)
             logs.append(f"Task '{t.title}' → priority {priority}")
 

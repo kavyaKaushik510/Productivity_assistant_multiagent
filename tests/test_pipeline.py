@@ -1,44 +1,67 @@
-# tests/test_pipeline.py
-from orchestration.graph import build_graph
-from datetime import datetime
+import datetime
+from orchestration.graph import app
+from agents.schemas import CalendarEvent, TimeBlock 
 
-if __name__ == "__main__":
-    DOC_ID = "1Db_gPHiLzFE1HO4dBXB2RpLrdxTV8iAJAXF4RbaJekw"
 
-    workflow = build_graph(DOC_ID)
-    result: dict = workflow.invoke({})  # start with empty dict
+def save_logs(logs):
+    """Append logs to logs.txt with a timestamped heading."""
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open("logs.txt", "a", encoding="utf-8") as f:
+        f.write(f"\n=== Run at {now} ===\n")
+        for l in logs:
+            f.write(f"{l}\n")
 
-    print("=== Welcome to your personal productivity planning assistant ===")
-    print("=== Here is your day at a glance ===")
 
-    # --- Summaries ---
-    print("\n=== Email Summaries ===")
-    for s in result.get("summaries", []):
-        print(f"- [{s.category}] {s.subject}: {s.text}")
+def print_summaries(summaries):
+    print("\n=== 📧 Summaries ===")
+    for s in summaries:
+        print(f"- [{s.category}] {s.subject}\n  {s.text}\n")
 
-    # --- Tasks by Priority ---
-    print("\n=== Tasks by Priority ===")
-    grouped = {"HIGH": [], "MED": [], "LOW": []}
-    for t in result["tasks"]:
-        grouped[t.priority].append(t)
+
+def print_tasks_grouped(tasks):
+    print("\n=== ✅ Tasks ===")
+    groups = {"HIGH": [], "MED": [], "LOW": []}
+    for t in tasks:
+        groups.get(t.priority or "LOW", groups["LOW"]).append(t)
 
     for level in ["HIGH", "MED", "LOW"]:
-        print(f"\n[{level}]")
-        if not grouped[level]:
-            print("(none)")
-        for t in grouped[level]:
-            print(f"- {t.title} (due={t.due_date}, conf={t.confidence:.2f})")
-
-    # --- Proposed Time Blocks ---
-    print("\n=== Proposed Time Blocks ===")
-    for b in result["proposals"]:
-        print("-", b.convert_readable())
+        if groups[level]:
+            print(f"\n--- {level} Priority ---")
+            for t in groups[level]:
+                tag = "[MEETING]" if t.source == "meeting" else "[EMAIL]"
+                due = f" | Due: {t.due_date}" if t.due_date else ""
+                print(f"- {t.title} {tag}{due}")
 
 
-    log_file = "pipeline_logs.txt"
-    with open(log_file, "a", encoding="utf-8") as f:  # append mode so old runs aren’t erased
-        f.write(f"\n=== Run at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} ===\n")
-        for log in result["logs"]:
-            f.write(log + "\n")
-    print("\nLogs saved to pipeline_logs.txt")
+def print_calendar(calendar):
+    if not calendar:
+        return
 
+    print("\n=== 📅 Calendar Events ===")
+    for e in calendar.get("events", []):
+        ev = CalendarEvent(**e)   # rebuild model for formatting
+        print(f"- {ev.convert_readable()}")
+
+    print("\n=== 📌 Proposed Time Blocks ===")
+    for b in calendar.get("proposals", []):
+        tb = TimeBlock(**b)       # rebuild model for formatting
+        print(f"- {tb.convert_readable()}")
+
+
+def print_results(result):
+    print_summaries(result.get("summaries", []))
+    print_tasks_grouped(result.get("tasks", []))
+    print_calendar(result.get("calendar"))
+
+
+if __name__ == "__main__":
+    state = {"summaries": [], "tasks": [], "logs": []}
+    result = app.invoke(state)
+
+    # save logs to file
+    save_logs(result.get("logs", []))
+
+    # pretty-print results
+    print_results(result)
+
+    print("\n(Logs saved to logs.txt)")

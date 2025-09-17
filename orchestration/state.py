@@ -1,12 +1,10 @@
 # orchestration/state.py
-from pydantic import BaseModel
-from typing import List
-from agents.schemas import Task, TimeBlock, CalendarEvent
+from typing import TypedDict, List, Optional
+from agents.schemas import Summary, Task, CalendarResult
 
-
-class PlannerState(BaseModel):
-    """Holds shared state across the workflow."""
-    tasks: List[Task] = []
-    events: List[CalendarEvent] = []
-    proposals: List[TimeBlock] = []
-    logs: List[str] = []
+class WorkflowState(TypedDict, total=False):
+    """Shared state structure across the workflow."""
+    summaries: List[Summary]
+    tasks: List[Task]
+    logs: List[str]
+    calendar: Optional[CalendarResult]

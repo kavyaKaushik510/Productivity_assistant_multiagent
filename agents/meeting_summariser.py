@@ -13,7 +13,7 @@ class MeetingSummariser:
         self.prompt = ChatPromptTemplate.from_template(
             """
             You are an assistant that summarises meeting notes and extracts
-            actionable items for Kavya.
+            actionable items for user: Kavya.
 
             Step 1: Provide a concise summary of the meeting.
             Step 2: Extract key discussion points as bullet points.
