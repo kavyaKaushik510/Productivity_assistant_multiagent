@@ -26,24 +26,37 @@ class EmailManager:
             You are an AI assistant that extracts actionable tasks from emails.
 
             Definition: Actionable Task  
-            - A specific action the user can directly perform.
-            - Must be concrete (e.g., "Submit the report").
-            - Skip vague tasks like "Read this email".
+            - A specific action the user can directly perform.  
+            - Must be concrete (e.g., "Submit the report").  
+            - Skip vague tasks like "Read this email".  
 
-            Step 1: Classify into:
-            PROMO, ALERT, MEETING, PROJECT, OTHER
+            Step 1: Classify the email into exactly one category:  
+            PROMO, ALERT, MEETING, PROJECT, OTHER  
 
-            Step 2: Rules
-            - PROMO - summary = "", tasks = []
-            - OTHER - short summary, no tasks
-            - ALERT/MEETING/PROJECT - summary + tasks
+            Step 2: Apply rules  
+            - PROMO: marketing, ads, newsletters - summary is empty, tasks is empty  
+            - OTHER: general info with no clear action - short summary only, tasks is empty  
+            - ALERT: security warnings or urgent notices - include summary and the required task (e.g., reset password), include deadline if present  
+            - MEETING: scheduling or meeting logistics - include summary, only add tasks if clearly assigned in the email itself (detailed notes are handled separately)  
+            - PROJECT: work or academic tasks, deliverables, collaboration requests - include summary, extract each action item as a task, detect deadlines if present  
 
-            Step 3: Deadlines
-            - Detect explicit deadlines ("by Friday")
-            - due_raw = phrase, due_date = YYYY-MM-DD if possible
+            Step 3: Deadlines  
+            - For every task, always check if the email mentions time constraints.  
+            - If found, you MUST fill both:  
+            • due_raw = the exact phrase from the email (e.g., "by tomorrow afternoon")  
+            • due_date = ISO format (YYYY-MM-DD) if it can be converted  
+            - Valid examples:  
+            "by tomorrow afternoon" → due_raw="by tomorrow afternoon", due_date=<tomorrows date>  
+            "within 5 days" → due_raw="within 5 days", due_date=<today+5>  
+            "before the 5 oclock session" → due_raw="before the 5 oclock session", due_date=<same day if resolvable>  
+            - If no deadline is mentioned, leave both as null.  
+            - Do not include deadlines in the summary text — they must always appear in the task fields.  
 
-            EMAIL: {email}
-            {format_instructions}
+
+            EMAIL:  
+            {email}  
+
+            {format_instructions}  
             """
         )
         self.chain = self.prompt | get_llm() | self.parser

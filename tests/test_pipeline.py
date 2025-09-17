@@ -14,8 +14,17 @@ def save_logs(logs):
 
 def print_summaries(summaries):
     print("\n=== 📧 Summaries ===")
+    groups = {"PROJECT": [], "ALERT": [], "MEETING": [], "OTHER": [], "PROMO": []}
+
     for s in summaries:
-        print(f"- [{s.category}] {s.subject}\n  {s.text}\n")
+        groups.get(s.category, groups["OTHER"]).append(s)
+
+    for cat in ["ALERT", "PROJECT", "MEETING", "OTHER"]:
+        if groups[cat]:
+            print(f"\n--- {cat} ---")
+            for s in groups[cat]:
+                print(f"- {s.subject}\n  {s.text}\n")
+
 
 
 def print_tasks_grouped(tasks):

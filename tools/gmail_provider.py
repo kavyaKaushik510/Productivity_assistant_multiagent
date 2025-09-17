@@ -1,10 +1,25 @@
 import imaplib
 import email
+from email.header import decode_header
 from typing import List, Dict, Any
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
+
+
+def decode_mime_header(raw_subject: str) -> str:
+    """Decode MIME-encoded email subject into a readable string."""
+    if not raw_subject:
+        return ""
+    parts = decode_header(raw_subject)
+    decoded = ""
+    for text, enc in parts:
+        if isinstance(text, bytes):
+            decoded += text.decode(enc or "utf-8", errors="ignore")
+        else:
+            decoded += text
+    return decoded
 
 
 def fetch_emails(limit: int = 5) -> List[Dict]:
@@ -50,7 +65,7 @@ def fetch_emails(limit: int = 5) -> List[Dict]:
             "id": mid.decode(),
             "from": msg.get("From"),
             "to": msg.get("To"),
-            "subject": msg.get("Subject"),
+            "subject": decode_mime_header(msg.get("Subject")),  # 👈 FIX
             "body": body.strip()
         })
 
@@ -59,6 +74,5 @@ def fetch_emails(limit: int = 5) -> List[Dict]:
 
 
 if __name__ == "__main__":
-    # Quick smoke test
     for m in fetch_emails(3):
         print(f"- {m['subject']} ({m['from']})")

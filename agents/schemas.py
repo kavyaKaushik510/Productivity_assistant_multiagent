@@ -26,7 +26,6 @@ class EmailResponse(BaseModel):
     tasks: List[Task] = []
 
 #Meeting Agent Schemas
-
 class MeetingResponse(BaseModel):
     summary: str = Field(..., description="Main summary of the meeting")
     discussion_points: List[str] = Field(default_factory=list)

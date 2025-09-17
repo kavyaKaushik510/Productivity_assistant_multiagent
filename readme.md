@@ -25,12 +25,13 @@ It integrates with **Gmail, Google Docs, and Google Calendar** to automatically 
 
 1. **Clone the repo and install requirements**  
    ```bash
-   git clone <your-repo-url>
-   cd <your-repo-folder>
+   git clone https://github.com/kavyaKaushik510/Productivity_assistant_multiagent.git
    pip install -r requirements.txt
 
-1. **Run the final pipeline**
+2. **Run the final pipeline**
    ```bash
 python -m tests.test_pipeline
+
+sample_output.txt contains an example of a run setup
   
    

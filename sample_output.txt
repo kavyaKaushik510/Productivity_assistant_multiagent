@@ -1,0 +1,67 @@
+=== 📧 Summaries ===
+
+--- ALERT ---
+- Security Alert – Password reset required
+  Suspicious activity detected on your Google account requiring immediate action.
+
+
+--- PROJECT ---
+- Fwd: Notes: 'Weekly Online 4125/4124C Team Meeting' 7 Sept 2025
+  The team discussed formatting standards for their report and assigned specific tasks to team members to ensure the report's clarity and alignment with the rubric.
+
+- Review Slides for Presentation
+  Kavya is requested to review the draft slides for the pitch deck and provide feedback to finalize the design.
+
+- Documents Upload for Verifications
+  Request to upload ID for verification.
+
+
+--- MEETING ---
+- Fwd: Notes: 'Weekly Online 4125/4124C Team Meeting' 7 Sept 2025
+  The team discussed formatting standards for their report on the impact of floating solar farms, agreeing on bright orange headings, Times New Roman font, justified paragraph alignment, and consistent bullet point numbering. They decided to weave the South African context throughout the report and include conclusions for each major section. AI will be used for the introduction and conclusion, with a focus on verifying AI-generated content and ensuring clarity in visual elements.
+
+
+=== ✅ Tasks ===
+
+--- HIGH Priority ---
+- Review the draft slides for the pitch deck and send feedback [EMAIL] | Due: 2025-09-18
+
+--- MED Priority ---
+- Upload your ID on the website [EMAIL] | Due: 2025-09-20
+
+--- LOW Priority ---
+- Read Zainodine Dawood's section to ensure alignment regarding occupational health and safety. [MEETING]
+- Update the references in the document once all sections are finalized. [MEETING]
+- Use the insert caption feature in Word to track figure and table numbers automatically. [MEETING]
+- Update the section structure to align with the rubric's suggested flow for the social impact factors and stakeholder identification. [EMAIL]
+- Remove the 'South African context' subheadings from each section and ensure there is only one conclusion at the end of each main section. [EMAIL]
+- Add references to the sections. [EMAIL]
+- Remove the summary at the end of the section if it duplicates information from the mermaid graph and its explanation. [EMAIL]
+- Add a key to the mermaid graph to explain what the letters represent, and tidy up the flow diagram by aligning boxes and making lines straighter. [EMAIL]
+- Add color to the flowchart to make it more visually appealing and change the font of the figure names to unbold and smaller referencing figure. [EMAIL]
+- Ensure all tasks are completed before the 5 o'clock session. [EMAIL]
+- Reset your password immediately using the provided link. [EMAIL]
+
+=== 📅 Calendar Events ===
+- Supervisor meeting: Thu 18 Sep, 11:00 → 11:30
+- Flight to Johannesburg (FA 299): Fri 19 Sep, 10:15 → 12:20
+- TrendLab / Kavya: Fri 19 Sep, 19:00 → 19:30
+- Weekly Online 4125/4124C Team Meeting: Sat 20 Sep, 14:00 → 15:00
+- TrendLab / Kavya: Mon 22 Sep, 19:00 → 19:30
+
+=== 📌 Proposed Time Blocks ===
+- Read Zainodine Dawood's section to ensure alignment regarding occupational health and safety.: Thu 18 Sep, 09:30 → 10:30
+- Update the references in the document once all sections are finalized.: Thu 18 Sep, 10:45 → 11:45
+- Use the insert caption feature in Word to track figure and table numbers automatically.: Thu 18 Sep, 12:00 → 13:00
+- Update the section structure to align with the rubric's suggested flow for the social impact factors and stakeholder identification.: Thu 18 Sep, 13:15 → 14:15
+- Remove the 'South African context' subheadings from each section and ensure there is only one conclusion at the end of each main section.: Thu 18 Sep, 14:30 → 15:30
+- Add references to the sections.: Thu 18 Sep, 15:45 → 16:45
+- Remove the summary at the end of the section if it duplicates information from the mermaid graph and its explanation.: Thu 18 Sep, 17:00 → 18:00
+- Add a key to the mermaid graph to explain what the letters represent, and tidy up the flow diagram by aligning boxes and making lines straighter.: Fri 19 Sep, 10:30 → 11:30
+- Add color to the flowchart to make it more visually appealing and change the font of the figure names to unbold and smaller referencing figure.: Fri 19 Sep, 11:45 → 12:45
+- Ensure all tasks are completed before the 5 o'clock session.: Fri 19 Sep, 13:00 → 14:00
+- Reset your password immediately using the provided link.: Fri 19 Sep, 14:15 → 15:15
+- Review the draft slides for the pitch deck and send feedback: Fri 19 Sep, 15:30 → 16:30
+- Upload your ID on the website: Sat 20 Sep, 09:30 → 10:30
+
+(Logs saved to logs.txt)
